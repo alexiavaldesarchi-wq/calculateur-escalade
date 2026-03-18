@@ -1,235 +1,489 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculateur salle escalade</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calculateur budget salle d'escalade</title>
 
 <style>
-
-body{
-font-family:Inter, Arial, sans-serif;
-background:#ffffff;
-margin:0;
-padding:60px;
-color:#111;
+:root{
+--paper:#f8f6ef;
+--ink:#111;
+--line:#b8b1a4;
+--bg:#ffffff;
+--shadow:0 22px 60px rgba(0,0,0,0.16);
 }
 
-.container{
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:"Courier New",monospace;
+background:var(--bg);
+padding:40px;
+}
+
+.wrap{
 max-width:1200px;
 margin:auto;
 display:grid;
-grid-template-columns:420px 1fr;
-gap:60px;
+grid-template-columns:1.05fr 0.95fr;
+gap:26px;
 align-items:start;
 }
 
-.panel{
-background:#f7f7f8;
-border-radius:18px;
-padding:30px;
-}
-
-.result{
-background:#ffffff;
-border-radius:22px;
-padding:50px;
-box-shadow:0 40px 80px rgba(0,0,0,0.08);
+.card{
+background:var(--paper);
+border:1.5px solid var(--line);
+box-shadow:var(--shadow);
+padding:28px 28px 32px 88px;
+position:relative;
 }
 
 h1{
+margin:0 0 20px;
 font-size:26px;
-margin-bottom:25px;
+text-transform:uppercase;
 }
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px 18px;
+}
+
+.full{grid-column:1/-1}
 
 label{
-display:block;
-font-size:14px;
-margin-top:18px;
-font-weight:600;
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.06em;
 }
 
-input,select{
+input[type=number],input[type=text],select{
 width:100%;
-padding:12px;
-margin-top:6px;
-border-radius:10px;
-border:1px solid #ddd;
-font-size:14px;
-background:white;
+border:0;
+border-bottom:1.5px solid #000;
+padding:8px 0;
+font-family:inherit;
+font-size:15px;
+background:transparent;
 }
 
 input[type=range]{
-accent-color:#7c3aed;
-}
-
-.checks{
-margin-top:10px;
-display:grid;
-gap:8px;
-}
-
-.big{
-font-size:72px;
-font-weight:900;
-color:#7c3aed;
-line-height:1;
+width:100%;
+appearance:none;
+background:transparent;
 margin-top:10px;
 }
 
-.small{
-margin-top:10px;
-color:#888;
+input[type=range]::-webkit-slider-runnable-track{
+height:14px;
+border:2px solid #000;
+border-radius:999px;
+}
+
+input[type=range]::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:32px;
+height:8px;
+background:#000;
+border-radius:999px;
+margin-top:2px;
+}
+
+input[type=range]::-moz-range-track{
+height:14px;
+border:2px solid #000;
+border-radius:999px;
+background:transparent;
+}
+
+input[type=range]::-moz-range-thumb{
+width:32px;
+height:8px;
+background:#000;
+border:0;
+border-radius:999px;
+}
+
+.checks{display:grid;gap:8px;margin-top:8px}
+
+.checks label{
 font-size:14px;
+font-weight:400;
+text-transform:none;
+letter-spacing:0;
+display:flex;
+align-items:center;
+}
+
+.checks input{
+appearance:none;
+width:18px;height:18px;
+border:2px solid #000;
+margin-right:10px;
+background:transparent;
+}
+
+.checks input:checked{background:#000}
+
+.result-title{
+font-size:12px;
+letter-spacing:.2em;
+text-transform:uppercase;
+border-bottom:1px solid var(--line);
+padding-bottom:12px;
+}
+
+.result-main{
+font-size:56px;
+font-weight:700;
+margin-top:18px;
+}
+
+.result-range{
+font-size:13px;
+margin-top:12px;
+color:#666;
 }
 
 .notes{
-margin-top:40px;
-font-size:14px;
+margin-top:26px;
+font-size:13px;
+line-height:1.6;
 color:#666;
-line-height:1.5;
+border-top:1px solid var(--line);
+padding-top:18px;
 }
+
+.contact-box{
+margin-top:24px;
+border-top:1px solid var(--line);
+padding-top:18px;
+}
+
+.contact-title{
+font-size:13px;
+font-weight:700;
+text-transform:uppercase;
+letter-spacing:.08em;
+margin-bottom:12px;
+}
+
+.button{
+margin-top:14px;
+padding:12px 16px;
+border:2px solid #000;
+background:#000;
+color:#fff;
+font-family:inherit;
+font-size:14px;
+cursor:pointer;
+text-transform:uppercase;
+letter-spacing:.06em;
+}
+
+.button:hover{opacity:.9}
 
 @media(max-width:900px){
-body{padding:30px;}
-.container{grid-template-columns:1fr;}
-.big{font-size:48px;}
+.wrap{grid-template-columns:1fr}
+.card{padding-left:28px}
+.result-main{font-size:42px}
+.grid{grid-template-columns:1fr}
 }
-
 </style>
 </head>
 
 <body>
+<div class="wrap">
 
-<div class="container">
+<section class="card">
+<h1>Paramètres projet</h1>
 
-<div class="panel">
+<div class="grid">
 
-<h1>Paramètres</h1>
+<div>
+<label>Surface du bâtiment</label>
+<input id="surface" type="number" value="0" />
+</div>
 
-<label>Surface</label>
-<input id="surface" type="number" value="500">
-
+<div>
 <label>Hauteur</label>
-<input id="hauteur" type="number" value="8">
+<input id="hauteur" type="number" value="0" />
+</div>
 
+<div>
 <label>Projet</label>
 <select id="mode">
 <option value="neuf">Neuf</option>
 <option value="reno">Rénovation</option>
 </select>
+</div>
 
-<label>Linéaire mur <span id="murValeur">60</span> ml</label>
-<input id="mur" type="range" min="10" max="200" value="60">
+<div>
+<label>Places de parking</label>
+<input id="park" type="number" value="0" />
+</div>
 
-<label>Parking</label>
-<input id="parking" type="number" value="20">
+<div class="full">
+<label>Linéaire de mur d'escalade <span id="murVal">0</span> ml</label>
+<input id="mur" type="range" min="0" max="200" value="0" />
+</div>
 
+<div>
+<label>Rénovation</label>
+<div class="checks">
+<label><input id="renoLeg" type="checkbox">Rénovation légère</label>
+<label><input id="renoLou" type="checkbox">Rénovation lourde</label>
+</div>
+</div>
+
+<div>
+<label>Démolition</label>
+<div class="checks">
+<label><input id="demoLeg" type="checkbox">Démolition légère</label>
+<label><input id="demoLou" type="checkbox">Démolition lourde</label>
+</div>
+</div>
+
+<div>
+<label>Technique</label>
+<div class="checks">
+<label><input id="chauff" type="checkbox">Chauffage</label>
+<label><input id="vent" type="checkbox">Ventilation</label>
+<label><input id="raf" type="checkbox">Rafraîchissement</label>
+</div>
+</div>
+
+<div>
 <label>Vestiaires</label>
 <select id="vest">
+<option value="0">Aucun</option>
 <option value="20000">Minimal</option>
 <option value="40000">Standard</option>
 <option value="80000">Confort</option>
 </select>
+</div>
 
-<label>Niveau prestations</label>
+<div>
+<label>Qualité des prestations</label>
 <select id="prest">
 <option value="1">Brut</option>
 <option value="1.2">Normal</option>
 <option value="1.4">Soigné</option>
 </select>
+</div>
 
+<div>
+<label>Options exploitation</label>
 <div class="checks">
-<label><input id="chauff" type="checkbox"> Chauffage</label>
-<label><input id="vent" type="checkbox"> Ventilation</label>
-<label><input id="raf" type="checkbox"> Rafraîchissement</label>
+<label><input id="bar" type="checkbox">Bar</label>
+<label><input id="snack" type="checkbox">Snack</label>
+<label><input id="cuisine" type="checkbox">Cuisine</label>
+</div>
+</div>
+
+<div>
+<label>Adresse du projet</label>
+<input id="adresseProjet" type="text" value="" />
 </div>
 
 </div>
+</section>
 
-<div class="result">
-
-<div>Budget estimatif</div>
-
-<div class="big" id="prix">0 €</div>
-
-<div class="small" id="fourchette">0 — 0</div>
+<aside class="card">
+<div class="result-title">Budget estimatif</div>
+<div class="result-main" id="resMain">0 €</div>
+<div class="result-range" id="resRange">0 — 0</div>
 
 <div class="notes">
-Estimation indicative basée sur les hypothèses renseignées.  
-Une étude spécifique est nécessaire pour obtenir un budget fiable.  
-Le mobilier, les équipements informatiques et les éléments hors bâtiment ne sont pas inclus.
+Estimation indicative basée sur les hypothèses renseignées.<br>
+Cette estimation ne comprend pas les raccordements aux réseaux et les aléas éventuels.
 </div>
 
+<div class="contact-box">
+<div class="contact-title">Pour une évaluation personnalisée contactez-nous</div>
+<button class="button" id="sendBtn" type="button">Envoyer</button>
+<div id="formMessage" class="notes" style="display:none; margin-top:14px; border-top:0; padding-top:0;"></div>
 </div>
+</aside>
 
 </div>
 
 <script>
-
-const surface = document.getElementById("surface")
-const hauteur = document.getElementById("hauteur")
-const mode = document.getElementById("mode")
-const mur = document.getElementById("mur")
-const murValeur = document.getElementById("murValeur")
-const parking = document.getElementById("parking")
-const vest = document.getElementById("vest")
-const prest = document.getElementById("prest")
-const chauff = document.getElementById("chauff")
-const vent = document.getElementById("vent")
-const raf = document.getElementById("raf")
-const prix = document.getElementById("prix")
-const fourchette = document.getElementById("fourchette")
-
 function euro(n){
-return Math.round(n).toLocaleString("fr-FR")+" €"
+  return Math.round(n).toLocaleString('fr-FR') + ' €';
+}
+
+const surfaceEl = document.getElementById('surface');
+const hauteurEl = document.getElementById('hauteur');
+const modeEl = document.getElementById('mode');
+const murEl = document.getElementById('mur');
+const murValEl = document.getElementById('murVal');
+const parkEl = document.getElementById('park');
+const vestEl = document.getElementById('vest');
+const chauffEl = document.getElementById('chauff');
+const ventEl = document.getElementById('vent');
+const rafEl = document.getElementById('raf');
+const prestEl = document.getElementById('prest');
+const barEl = document.getElementById('bar');
+const snackEl = document.getElementById('snack');
+const cuisineEl = document.getElementById('cuisine');
+const renoLegEl = document.getElementById('renoLeg');
+const renoLouEl = document.getElementById('renoLou');
+const demoLegEl = document.getElementById('demoLeg');
+const demoLouEl = document.getElementById('demoLou');
+const adresseProjetEl = document.getElementById('adresseProjet');
+const resMainEl = document.getElementById('resMain');
+const resRangeEl = document.getElementById('resRange');
+const sendBtnEl = document.getElementById('sendBtn');
+
+function getResults(){
+  const s = Number(surfaceEl.value) || 0;
+  const h = Number(hauteurEl.value) || 0;
+  const mur = Number(murEl.value) || 0;
+  const park = Number(parkEl.value) || 0;
+  const vest = Number(vestEl.value) || 0;
+  const prest = Number(prestEl.value) || 1;
+
+  murValEl.textContent = mur;
+
+  let murCoef = 1;
+  if (renoLegEl.checked) murCoef = 1.08;
+  if (renoLouEl.checked) murCoef = 1.18;
+
+  const murBase = mur * 4.9 * 1.2 * 240 + 165 * mur * 3;
+  const murMin = murBase * murCoef;
+  const murMax = murBase * 1.2 * murCoef;
+
+  const batMin = modeEl.value === 'neuf' ? s * 700 : s * 200;
+  const batMax = modeEl.value === 'neuf' ? s * 1300 : s * 400;
+
+  let demo = 0;
+  if (demoLegEl.checked) demo += s * 40;
+  if (demoLouEl.checked) demo += s * 220;
+
+  let cvc = 0;
+  if (chauffEl.checked) cvc += (s / 500) * 20000;
+  if (ventEl.checked) cvc += (s / 1000) * 170000;
+  if (rafEl.checked) cvc += (s / 1000) * 50000;
+
+  const optionsCost =
+    (barEl.checked ? 15000 : 0) +
+    (snackEl.checked ? 30000 : 0) +
+    (cuisineEl.checked ? 100000 : 0);
+
+  const hauteurCost = h > 6 ? (h - 6) * s * 35 : 0;
+  const parkingCost = park * 3500;
+
+  const sousMin = batMin + murMin + demo + cvc + hauteurCost + parkingCost + vest + optionsCost;
+  const sousMax = batMax + murMax + demo + cvc + hauteurCost + parkingCost + vest + optionsCost;
+
+  const totalMin = sousMin * 1.12 * prest;
+  const totalMax = sousMax * 1.12 * prest;
+  const central = (totalMin + totalMax) / 2;
+
+  return {
+    totalMin,
+    totalMax,
+    central,
+    surface:s,
+    hauteur:h,
+    mode:modeEl.value,
+    mur,
+    park,
+    vest:vestEl.options[vestEl.selectedIndex].text,
+    renoLeg:renoLegEl.checked,
+    renoLou:renoLouEl.checked,
+    demoLeg:demoLegEl.checked,
+    demoLou:demoLouEl.checked,
+    chauff:chauffEl.checked,
+    vent:ventEl.checked,
+    raf:rafEl.checked,
+    prest:prestEl.options[prestEl.selectedIndex].text,
+    bar:barEl.checked,
+    snack:snackEl.checked,
+    cuisine:cuisineEl.checked,
+    adresse:adresseProjetEl.value || ''
+  };
 }
 
 function calc(){
-
-let s=+surface.value||0
-let h=+hauteur.value||0
-let murml=+mur.value||0
-let park=+parking.value||0
-let vestc=+vest.value||0
-let prestc=+prest.value||1
-
-murValeur.innerHTML=murml
-
-let batmin = mode.value=="neuf"?s*700:s*200
-let batmax = mode.value=="neuf"?s*1300:s*400
-
-let murbase = murml*4.9*1.2*240 +165*murml*3
-let murmin=murbase
-let murmax=murbase*1.2
-
-let cvc=0
-if(chauff.checked)cvc+=s/500*20000
-if(vent.checked)cvc+=s/1000*170000
-if(raf.checked)cvc+=s/1000*50000
-
-let hauteurcout=h>6?(h-6)*s*35:0
-let parkingcout=park*3500
-
-let sousmin=batmin+murmin+cvc+hauteurcout+parkingcout+vestc
-let sousmax=batmax+murmax+cvc+hauteurcout+parkingcout+vestc
-
-let totalmin=sousmin*1.12*prestc
-let totalmax=sousmax*1.12*prestc
-
-let central=(totalmin+totalmax)/2
-
-prix.innerHTML=euro(central)
-fourchette.innerHTML=euro(totalmin)+" — "+euro(totalmax)
-
+  const r = getResults();
+  resMainEl.textContent = euro(r.central);
+  resRangeEl.textContent = euro(r.totalMin) + ' — ' + euro(r.totalMax);
 }
 
-document.querySelectorAll("input,select").forEach(e=>{
-e.oninput=calc
-})
+async function sendLead(){
+  const r = getResults();
+  const formMessageEl = document.getElementById('formMessage');
 
-calc()
+  sendBtnEl.disabled = true;
+  sendBtnEl.textContent = 'Envoi...';
+  formMessageEl.style.display = 'none';
+  formMessageEl.textContent = '';
 
+  const payload = {
+    _subject: 'Demande d’évaluation personnalisée - salle d’escalade',
+    adresse_projet: r.adresse,
+    budget_moyen: euro(r.central),
+    fourchette_basse: euro(r.totalMin),
+    fourchette_haute: euro(r.totalMax),
+    surface_batiment_m2: r.surface,
+    hauteur_m: r.hauteur,
+    projet: r.mode,
+    lineaire_mur_escalade_ml: r.mur,
+    places_parking: r.park,
+    vestiaires: r.vest,
+    renovation_legere: r.renoLeg ? 'oui' : 'non',
+    renovation_lourde: r.renoLou ? 'oui' : 'non',
+    demolition_legere: r.demoLeg ? 'oui' : 'non',
+    demolition_lourde: r.demoLou ? 'oui' : 'non',
+    chauffage: r.chauff ? 'oui' : 'non',
+    ventilation: r.vent ? 'oui' : 'non',
+    rafraichissement: r.raf ? 'oui' : 'non',
+    qualite_prestations: r.prest,
+    option_bar: r.bar ? 'oui' : 'non',
+    option_snack: r.snack ? 'oui' : 'non',
+    option_cuisine: r.cuisine ? 'oui' : 'non',
+    source: 'Calculateur salle d’escalade'
+  };
+
+  try {
+    const response = await fetch('https://formspree.io/f/mvzwdbap', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      formMessageEl.style.display = 'block';
+      formMessageEl.textContent = 'Merci, votre demande est envoyée.';
+    } else {
+      formMessageEl.style.display = 'block';
+      formMessageEl.textContent = 'L’envoi a échoué. Merci de réessayer.';
+    }
+  } catch (error) {
+    formMessageEl.style.display = 'block';
+    formMessageEl.textContent = 'L’envoi a échoué. Merci de réessayer.';
+  } finally {
+    sendBtnEl.disabled = false;
+    sendBtnEl.textContent = 'Envoyer';
+  }
+}
+
+document.querySelectorAll('input, select').forEach((el) => {
+  el.addEventListener('input', calc);
+  el.addEventListener('change', calc);
+});
+
+sendBtnEl.addEventListener('click', sendLead);
+
+calc();
 </script>
 
 </body>
