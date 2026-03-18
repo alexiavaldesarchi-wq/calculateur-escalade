@@ -9,61 +9,100 @@
       font-family:Arial, Helvetica, sans-serif;
       margin:0;
       padding:40px;
-      background:linear-gradient(135deg,#ff3df0,#ffe23d,#3df6ff);
+      background:#ffffff;
+      color:#111;
     }
+
     .container{
       max-width:1200px;
       margin:auto;
       display:grid;
       grid-template-columns:1fr 380px;
       gap:30px;
+      align-items:start;
     }
+
     .card{
-      background:white;
       border:4px solid black;
       border-radius:20px;
       box-shadow:8px 8px 0 black;
       padding:25px;
     }
+
+    .form-card{
+      background:#eef6ff;
+      border-color:#2563eb;
+      box-shadow:8px 8px 0 #2563eb;
+    }
+
     .result{
       position:sticky;
       top:20px;
       height:fit-content;
       text-align:center;
+      background:#fff4e6;
+      border-color:#ea580c;
+      box-shadow:8px 8px 0 #ea580c;
     }
+
     .big{
       font-size:48px;
       font-weight:900;
-      color:#ff3df0;
+      color:#d946ef;
       margin-top:10px;
+      line-height:1.05;
     }
+
     .small{
       font-size:12px;
       color:#555;
       margin-top:8px;
     }
+
+    h1{
+      margin:0 0 20px 0;
+      font-size:30px;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
     label{
       display:block;
       margin-top:15px;
       font-weight:bold;
     }
+
     input[type="number"], select{
       width:100%;
-      padding:8px;
-      margin-top:5px;
+      padding:10px;
+      margin-top:6px;
       box-sizing:border-box;
+      border:2px solid black;
+      border-radius:10px;
+      background:white;
+      font-size:15px;
     }
+
     input[type="range"]{
       width:100%;
-      margin-top:8px;
+      margin-top:10px;
+      accent-color:#d946ef;
     }
+
     .checks{
       margin-top:8px;
+      display:grid;
+      gap:8px;
     }
+
     .checks label{
       font-weight:normal;
-      margin-top:6px;
+      margin-top:0;
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
+
     .notes{
       margin-top:24px;
       font-size:14px;
@@ -71,9 +110,12 @@
       line-height:1.5;
       text-align:left;
     }
+
     @media (max-width: 900px){
+      body{ padding:20px; }
       .container{ grid-template-columns:1fr; }
       .result{ position:static; }
+      .big{ font-size:38px; }
     }
   </style>
 </head>
@@ -81,7 +123,9 @@
 
 <div class="container">
 
-  <div class="card">
+  <div class="card form-card">
+    <h1>Paramètres projet</h1>
+
     <label for="surface">Surface (m²)</label>
     <input id="surface" type="number" value="500" min="0">
 
