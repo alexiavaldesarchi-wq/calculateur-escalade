@@ -1,59 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculateur budget salle d'escalade</title>
+  <style>
+    body{
+      font-family:Arial, Helvetica, sans-serif;
+      margin:0;
+      padding:40px;
+      background:linear-gradient(135deg,#ff3df0,#ffe23d,#3df6ff);
+    }
+    .container{
+      max-width:1200px;
+      margin:auto;
+      display:grid;
+      grid-template-columns:1fr 380px;
+      gap:30px;
+    }
+    .card{
+      background:white;
+      border:4px solid black;
+      border-radius:20px;
+      box-shadow:8px 8px 0 black;
+      padding:25px;
+    }
+    .result{
+      position:sticky;
+      top:20px;
+      height:fit-content;
+      text-align:center;
+    }
+    .big{
+      font-size:48px;
+      font-weight:900;
+      color:#ff3df0;
+      margin-top:10px;
+    }
+    .small{
+      font-size:12px;
+      color:#555;
+      margin-top:8px;
+    }
+    label{
+      display:block;
+      margin-top:15px;
+      font-weight:bold;
+    }
+    input[type="number"], select{
+      width:100%;
+      padding:8px;
+      margin-top:5px;
+      box-sizing:border-box;
+    }
+    input[type="range"]{
+      width:100%;
+      margin-top:8px;
+    }
+    .checks{
+      margin-top:8px;
+    }
+    .checks label{
+      font-weight:normal;
+      margin-top:6px;
+    }
+    .notes{
+      margin-top:24px;
+      font-size:14px;
+      color:#555;
+      line-height:1.5;
+      text-align:left;
+    }
+    @media (max-width: 900px){
+      .container{ grid-template-columns:1fr; }
+      .result{ position:static; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="card">
+    <label for="surface">Surface (m²)</label>
+    <input id="surface" type="number" value="500" min="0">
+
+    <label for="hauteur">Hauteur (m)</label>
+    <input id="hauteur" type="number" value="8" min="0" step="0.1">
+
+    <label for="mode">Projet</label>
+    <select id="mode">
+      <option value="neuf">Neuf</option>
+      <option value="reno">Rénovation</option>
+    </select>
+
+    <label for="mur">Linéaire mur : <span id="murValeur">60</span> ml</label>
+    <input id="mur" type="range" min="10" max="200" value="60">
+
+    <label for="parking">Parking</label>
+    <input id="parking" type="number" value="20" min="0">
+
+    <label for="vest">Vestiaires</label>
+    <select id="vest">
+      <option value="20000">Minimal</option>
+      <option value="40000">Standard</option>
+      <option value="80000">Confort</option>
+    </select>
+
+    <label for="prest">Prestations</label>
+    <select id="prest">
+      <option value="1">Brut</option>
+      <option value="1.2">Normal</option>
+      <option value="1.4">Soigné</option>
+    </select>
+
+    <div class="checks">
+      <label><input id="chauff" type="checkbox"> Chauffage</label>
+      <label><input id="vent" type="checkbox"> Ventilation</label>
+      <label><input id="raf" type="checkbox"> Rafraîchissement</label>
+    </div>
+  </div>
+
+  <div class="card result">
+    <div>Budget estimatif</div>
+    <div class="big" id="prix">0 €</div>
+    <div class="small" id="fourchette">0 € — 0 €</div>
+
+    <div class="notes">
+      <p>Estimation indicative basée sur les hypothèses renseignées. Une étude spécifique du projet est indispensable pour établir un budget fiable.</p>
+      <p>Cette estimation n’intègre pas le mobilier, les équipements informatiques, ni les aménagements non liés directement au bâtiment.</p>
+    </div>
+  </div>
+
+</div>
+
 <script>
-const surfaceEl = document.getElementById("surface");
-const hauteurEl = document.getElementById("hauteur");
-const modeEl = document.getElementById("mode");
-const murEl = document.getElementById("mur");
-const parkingEl = document.getElementById("parking");
-const vestEl = document.getElementById("vest");
-const chauffEl = document.getElementById("chauff");
-const ventEl = document.getElementById("vent");
-const rafEl = document.getElementById("raf");
-const prestEl = document.getElementById("prest");
-const prixEl = document.getElementById("prix");
-const fourchetteEl = document.getElementById("fourchette");
+  const surfaceEl = document.getElementById("surface");
+  const hauteurEl = document.getElementById("hauteur");
+  const modeEl = document.getElementById("mode");
+  const murEl = document.getElementById("mur");
+  const murValeurEl = document.getElementById("murValeur");
+  const parkingEl = document.getElementById("parking");
+  const vestEl = document.getElementById("vest");
+  const prestEl = document.getElementById("prest");
+  const chauffEl = document.getElementById("chauff");
+  const ventEl = document.getElementById("vent");
+  const rafEl = document.getElementById("raf");
+  const prixEl = document.getElementById("prix");
+  const fourchetteEl = document.getElementById("fourchette");
 
-function calc() {
-  const s = Number(surfaceEl.value) || 0;
-  const h = Number(hauteurEl.value) || 0;
-  const murml = Number(murEl.value) || 0;
-  const park = Number(parkingEl.value) || 0;
-  const vest = Number(vestEl.value) || 0;
-  const prest = Number(prestEl.value) || 1;
+  function euro(n){
+    return Math.round(n).toLocaleString("fr-FR") + " €";
+  }
 
-  const batmin = modeEl.value === "neuf" ? s * 700 : s * 200;
-  const batmax = modeEl.value === "neuf" ? s * 1300 : s * 400;
+  function calc(){
+    const s = Number(surfaceEl.value) || 0;
+    const h = Number(hauteurEl.value) || 0;
+    const murml = Number(murEl.value) || 0;
+    const park = Number(parkingEl.value) || 0;
+    const vest = Number(vestEl.value) || 0;
+    const prest = Number(prestEl.value) || 1;
 
-  const murbase = murml * 4.9 * 1.2 * 240 + 165 * murml * 3;
-  const murmin = murbase;
-  const murmax = murbase * 1.2;
+    murValeurEl.textContent = murml;
 
-  let cvc = 0;
-  if (chauffEl.checked) cvc += (s / 500) * 20000;
-  if (ventEl.checked) cvc += (s / 1000) * 170000;
-  if (rafEl.checked) cvc += (s / 1000) * 50000;
+    const batmin = modeEl.value === "neuf" ? s * 700 : s * 200;
+    const batmax = modeEl.value === "neuf" ? s * 1300 : s * 400;
 
-  const hauteurcout = h > 6 ? (h - 6) * s * 35 : 0;
-  const parkingcout = park * 3500;
+    const murbase = murml * 4.9 * 1.2 * 240 + 165 * murml * 3;
+    const murmin = murbase;
+    const murmax = murbase * 1.2;
 
-  const sousmin = batmin + murmin + cvc + hauteurcout + parkingcout + vest;
-  const sousmax = batmax + murmax + cvc + hauteurcout + parkingcout + vest;
+    let cvc = 0;
+    if (chauffEl.checked) cvc += (s / 500) * 20000;
+    if (ventEl.checked) cvc += (s / 1000) * 170000;
+    if (rafEl.checked) cvc += (s / 1000) * 50000;
 
-  const totalmin = (sousmin * 1.12) * prest;
-  const totalmax = (sousmax * 1.12) * prest;
-  const central = (totalmin + totalmax) / 2;
+    const hauteurcout = h > 6 ? (h - 6) * s * 35 : 0;
+    const parkingcout = park * 3500;
 
-  prixEl.textContent = Math.round(central).toLocaleString("fr-FR") + " €";
-  fourchetteEl.textContent =
-    Math.round(totalmin).toLocaleString("fr-FR") +
-    " € — " +
-    Math.round(totalmax).toLocaleString("fr-FR") +
-    " €";
-}
+    const sousmin = batmin + murmin + cvc + hauteurcout + parkingcout + vest;
+    const sousmax = batmax + murmax + cvc + hauteurcout + parkingcout + vest;
 
-document.querySelectorAll("input, select").forEach((el) => {
-  el.addEventListener("input", calc);
-  el.addEventListener("change", calc);
-});
+    const totalmin = sousmin * 1.12 * prest;
+    const totalmax = sousmax * 1.12 * prest;
+    const central = (totalmin + totalmax) / 2;
 
-calc();
+    prixEl.textContent = euro(central);
+    fourchetteEl.textContent = euro(totalmin) + " — " + euro(totalmax);
+  }
+
+  document.querySelectorAll("input, select").forEach((el) => {
+    el.addEventListener("input", calc);
+    el.addEventListener("change", calc);
+  });
+
+  calc();
 </script>
+
+</body>
+</html>
